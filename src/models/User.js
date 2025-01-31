@@ -23,19 +23,16 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Password is required'],
     minlength: [6, 'Password must be at least 6 characters']
-  },
-  projects: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Project'
-  }]
+  }
 }, {
   timestamps: true
 });
 
+// Generate userId before saving
 userSchema.pre('save', async function(next) {
   try {
-    // Generate userId if it's a new document
     if (this.isNew) {
+      // Generate userId
       const prefix = this.name.substring(0, 3).toUpperCase();
       const User = this.constructor;
       
@@ -52,7 +49,7 @@ userSchema.pre('save', async function(next) {
       this.userId = `${prefix}${String(number).padStart(3, '0')}`;
     }
 
-    // Hash password only if it's new or modified
+    // Hash password if modified
     if (this.isModified('password')) {
       const salt = await bcrypt.genSalt(10);
       this.password = await bcrypt.hash(this.password, salt);
@@ -63,13 +60,5 @@ userSchema.pre('save', async function(next) {
     next(error);
   }
 });
-
-userSchema.methods.comparePassword = async function(candidatePassword) {
-  try {
-    return await bcrypt.compare(candidatePassword, this.password);
-  } catch (error) {
-    throw new Error('Error comparing passwords');
-  }
-};
 
 module.exports = mongoose.model('User', userSchema);

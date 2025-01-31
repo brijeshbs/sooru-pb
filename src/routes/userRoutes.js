@@ -6,8 +6,10 @@ const auth = require('../middleware/auth');
 // Public routes
 router.post('/register', userController.register);
 router.post('/login', userController.login);
+router.post('/forgot-password', userController.forgotPassword);
 
-// Protected routes
+// Protected routes (require authentication)
 router.get('/profile', auth, userController.getProfile);
+router.put('/profile', auth, userController.updateProfile);
 
 module.exports = router;

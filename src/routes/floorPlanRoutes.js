@@ -1,23 +1,21 @@
 const express = require('express');
 const router = express.Router();
 const floorPlanController = require('../controllers/floorPlanController');
+const auth = require('../middleware/auth');
 
-// Create a new floor plan
-router.post('/', floorPlanController.create);
+// All routes require authentication
+router.use(auth);
 
-// Generate AI floor plan
+// Floor plan routes
 router.post('/generate', floorPlanController.generate);
-
-// Get all floor plans
 router.get('/', floorPlanController.getAll);
-
-// Get specific floor plan
 router.get('/:id', floorPlanController.getById);
-
-// Update floor plan
 router.put('/:id', floorPlanController.update);
-
-// Delete floor plan
 router.delete('/:id', floorPlanController.delete);
+
+// Room-specific routes
+router.post('/:id/rooms', floorPlanController.addRoom);
+router.put('/:id/rooms/:roomId', floorPlanController.updateRoom);
+router.delete('/:id/rooms/:roomId', floorPlanController.deleteRoom);
 
 module.exports = router;
